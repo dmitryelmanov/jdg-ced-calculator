@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            display: grid;
+            row-gap: 80px;
+            grid-template-columns: 1fr 2fr 2fr 2fr 1fr;
+            grid-template-areas:
+                ". . . header header"
+                ". main main main .";
+            padding: 100px 10px;
+        }
+
+        .item {
+        }
+
+        .header {
+            grid-area: header;
+        }
+
+        .main {
+            grid-area: main;
+        }
+
+        table, th, td {
+            border-collapse: collapse;
+        }
+
+        tr.total {
+            background-color: #DCDCDC;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 3px 15px;
+            text-align: center;
+        }
+
+        th.no-border {
+            border: none;
+        }
+
+        th.right {
+            text-align: right;
+        }
+
+        td.left {
+            text-align: left;
+        }
+
+        td.total {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="item header">
+            <table class="table right">
+                <tr>
+                    <th class="right">Data:</th>
+                    <td class="left">{Today}</td>
+                </tr>
+                <tr>
+                    <th class="right">Faktura:</th>
+                    <td class="left">{Invoice}</td>
+                </tr>
+                <tr>
+                    <th class="right">Kwota:</th>
+                    <td class="left">{Amount}</td>
+                </tr>
+                <tr>
+                    <th class="right">Kod waluty:</th>
+                    <td class="left">{Currency}</td>
+                </tr>
+            </table>
+        </div>
+        <div class="item main">
+            <table class="table" width="100%">
+                <tr>
+                    <th class="no-border"></th>
+                    <th>Data publikacji</th>
+                    <th>Numer tabeli</th>
+                    <th>Kurs</th>
+                    <th>Kwota, PLN</th>
+                </tr>
+                <tr>
+                    <th class="right">Sprzedaż</th>
+                    <td>{Selling.Date}</td>
+                    <td>{Selling.Table}</td>
+                    <td>{Selling.Rate}</td>
+                    <td>{Selling.Amount}</td>
+                </tr>
+                <tr>
+                    <th class="right">Przychód</th>
+                    <td>{Income.Date}</td>
+                    <td>{Income.Table}</td>
+                    <td>{Income.Rate}</td>
+                    <td>{Income.Amount}</td>
+                </tr>
+                <tr class="total">
+                    <th class="right">Różnica</th>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="total">{Difference}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
