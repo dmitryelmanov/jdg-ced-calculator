@@ -1,0 +1,6 @@
+﻿{
+  "inputFileName": "input.json",
+  "templateFileName": "template.html",
+  "outputFileName": "plik.pdf",
+  "nbpApiUrl": "https://api.nbp.pl"
+}

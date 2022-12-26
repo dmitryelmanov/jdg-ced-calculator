@@ -1,7 +1,5 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json.Serialization;
-using static CurrencyExchangeDifferenceCalc.NbpClient;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CurrencyExchangeDifferenceCalc;
 
@@ -11,10 +9,10 @@ internal sealed class NbpClient
     private static readonly string CurrenciesQueryTemplate = "api/exchangerates/tables/a/{0}?format=json";
     private readonly HttpClient _httpClient;
 
-    public NbpClient()
+    public NbpClient(string nbpUrl)
     {
         _httpClient = new HttpClient();
-        _httpClient.BaseAddress = new Uri("https://api.nbp.pl");
+        _httpClient.BaseAddress = new Uri(nbpUrl);
     }
 
     public async Task<ExchangeRate> GetExchangeRateAsync(DateOnly date, string currency)

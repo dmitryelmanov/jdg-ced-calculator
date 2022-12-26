@@ -3,11 +3,43 @@ using CurrencyExchangeDifferenceCalc;
 using Microsoft.Extensions.Configuration;
 using PuppeteerSharp;
 
-Console.WriteLine("Hello, World!");
+Console.WriteLine("Currency exchange rate difference calculator");
 
 var confguration = new ConfigurationBuilder()
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("input.json", true, false)
+    .AddJsonFile("appsettings.json", true, false)
+    .AddCommandLine(args)
+    .Build();
+
+AppSettings? settings = null;
+try
+{
+    settings = confguration.Get<AppSettings>();
+}
+catch (Exception ex)
+{
+    while (ex.InnerException is not null)
+    {
+        ex = ex.InnerException;
+    }
+
+    switch (ex)
+    {
+        case FormatException fex:
+            LogInputErrors(new[] { fex.Message });
+            Console.WriteLine("\r\nPress any key to exit...");
+            Console.ReadKey();
+            return;
+        default:
+            throw;
+    };
+}
+
+settings ??= new AppSettings();
+confguration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", true, false)
+    .AddJsonFile(settings.InputFileName, true, false)
     .AddCommandLine(args)
     .Build();
 
@@ -27,6 +59,8 @@ catch (Exception ex)
     {
         case FormatException fex:
             LogInputErrors(new[] { fex.Message });
+            Console.WriteLine("\r\nPress any key to exit...");
+            Console.ReadKey();
             return;
         default:
             throw;
@@ -37,10 +71,12 @@ var validatonResult = new InputValidator().Validate(input);
 if (!validatonResult.IsValid)
 {
     LogInputErrors(validatonResult.Errors.Select(x => x.ErrorMessage));
+    Console.WriteLine("\r\nPress any key to exit...");
+    Console.ReadKey();
     return;
 }
 
-var nbpClient = new NbpClient();
+var nbpClient = new NbpClient(settings.NbpApiUrl);
 
 var currencies = await nbpClient.GetSupportedCurrenciesAsync(input!.IncomeDate);
 if (!currencies.Any(x => x.Code.ToUpper() == input!.Currency.ToUpper()))
@@ -51,6 +87,9 @@ if (!currencies.Any(x => x.Code.ToUpper() == input!.Currency.ToUpper()))
     {
         Console.WriteLine($"{currency.Code} - {currency.Name}");
     }
+
+    Console.WriteLine("\r\nPress any key to exit...");
+    Console.ReadKey();
     return;
 }
 
@@ -82,22 +121,21 @@ var output = new Output
 Console.WriteLine($"Exchange rate difference is {output.Difference.ToString("F4")} PLN");
 
 Console.WriteLine("Generating PDF...");
-var template = await File.ReadAllTextAsync("template.html");
+var template = await File.ReadAllTextAsync(settings.TemplateFileName);
 var html = OutputGenerator.Generate(output, template);
-var outputFile = "plik.pdf";
 
 await new BrowserFetcher().DownloadAsync(BrowserFetcher.DefaultChromiumRevision);
 var browser = await Puppeteer.LaunchAsync(new LaunchOptions
 {
     Headless = true
 });
-using (var page = await browser.NewPageAsync())
-{
-    await page.SetContentAsync(html);
-    var result = await page.GetContentAsync();
-    await page.PdfAsync(outputFile);
-}
+using var page = await browser.NewPageAsync();
+await page.SetContentAsync(html);
+var result = await page.GetContentAsync();
+await page.PdfAsync(settings.OutputFileName);
 
+Console.WriteLine("\r\nPress any key to exit...");
+Console.ReadKey();
 
 void LogInputErrors(IEnumerable<string> errors)
 {
