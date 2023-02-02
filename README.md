@@ -5,7 +5,7 @@ Is a tool to calculate currency exchange difference between Selling Date and Inc
 
 # How to use
 
-Fill in `input.json`. For example:
+* Fill in `input.json`. For example:
 ```
 {
   "InvoiceNumber": "1/12/2022",
@@ -15,3 +15,4 @@ Fill in `input.json`. For example:
   "IncomeDate": "2023-01-12"
 }
 ```
+* Run application
